@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Mensajero</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .jumbotron {
+            background-color: #f8f9fa;
+            padding: 2rem 2rem;
+            border-radius: 10px;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .nav-link {
+            font-size: 1.1rem;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        .fade-in {
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .rounded-circle {
+            transition: transform 0.2s;
+        }
+        .rounded-circle:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Logo</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                {% if not user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'create_cliente' %}">Solicita un mensajero</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'create_mensajero' %}">Trabaja con nosotros</a>
+                </li>
+                {% elif user.is_authenticated and user.is_cliente %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'crear_servicio' %}">Solicitar Servicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'listar_servicio' %}">Estado de Servicios</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {% if not user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+                {% else %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ user.imagenPerfil.url }}" alt="Perfil" class="rounded-circle" width="30" height="30">
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" >Actualizar Datos</a>
+                        <a class="dropdown-item" href="{% url 'logout' %}" >Logout</a>
+                    </div>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Registro de Mensajero</h2>
+        <form method="post" class="mt-4" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- fila 1 username y direccion -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="id_username">Nombre de usuario</label>
+                    {{ form.username }}
+                    <div class="text-danger">{{ form.errors.username }}</div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="id_direccion">Dirección</label>
+                    {{ form.direccion }}
+                    <div class="text-danger">{{ form.errors.direccion }}</div>
+                </div>
+            </div>
+
+            <!-- fila 1.5 correo y telefono -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="id_nombres">Nombre</label>
+                    {{ form.nombres }}
+                    <div class="text-danger">{{ form.errors.nombres }}</div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="id_apellidos">Apellidos</label>
+                    {{ form.apellidos }}
+                    <div class="text-danger">{{ form.errors.apellidos }}</div>
+                </div>
+            </div>
+
+            <!-- fila 2 correo y telefono -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="id_email">Correo</label>
+                    {{ form.email }}
+                    <div class="text-danger">{{ form.errors.email }}</div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="id_telefono">Teléfono</label>
+                    {{ form.telefono }}
+                    <div class="text-danger">{{ form.errors.telefono }}</div>
+                </div>
+            </div>
+
+            <!-- fila 3 identificacion y tipo de vehiculo -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="id_identificacion">Identificación</label>
+                    {{ form.identificacion }}
+                    <div class="text-danger">{{ form.errors.identificacion }}</div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="{{ form.vehiculo.id_for_label }}">Tipo de Vehículo</label>
+                    {{ form.vehiculo }}
+                    <div class="text-danger">{{ form.errors.vehiculo }}</div>
+                </div>
+            </div>
+            <!-- fila 3.5 ciudad y placa -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="{{ form.ciudad.id_for_label }}">Ciudad</label>
+                    {{ form.ciudad }}
+                    <div class="text-danger">{{ form.errors.ciudad }}</div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="id_placaVehiculo">Placa vehículo</label>
+                    {{ form.placaVehiculo }}
+                    <div class="text-danger">{{ form.errors.placaVehiculo }}</div>
+                </div>
+            </div>
+
+            <!-- fila 4 contraseña y confirmar contraseña-->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="id_password">Contraseña</label>
+                    {{ form.password }}
+                    <div class="text-danger">{{ form.errors.password }}</div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="id_confirm_password">Confirmar la contraseña</label>
+                    {{ form.confirm_password }}
+                    <div class="text-danger">{{ form.errors.confirm_password }}</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="id_imagenPerfil">Imagen de Perfil</label>
+                        {{ form.imagenPerfil}}
+                    <div class="text-danger">{{ form.errors.password }}</div>
+                </div>
+            </div>
+
+           
+
+            <button type="submit" class="btn btn-primary">Registrar</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

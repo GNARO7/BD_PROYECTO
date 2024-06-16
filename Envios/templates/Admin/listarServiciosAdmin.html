@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .jumbotron {
+            background-color: #f8f9fa;
+            padding: 2rem 2rem;
+            border-radius: 10px;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .nav-link {
+            font-size: 1.1rem;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        .fade-in {
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .rounded-circle {
+            transition: transform 0.2s;
+        }
+        .rounded-circle:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Logo</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuario_list' %}">Listar Usuarios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin_servicio_list' %}">Listar Servicios</a>
+                </li>
+           
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {% if not user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+                {% else %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ user.imagenPerfil.url }}" alt="Perfil" class="rounded-circle" width="30" height="30">
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{% url 'actualizarCliente' user.id %}">Actualizar Datos</a>
+                        <a class="dropdown-item" href="{% url 'logout' %}" >Logout</a>
+                    </div>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+
+    <div class="container mt-4">
+        <h1>Lista de Servicios</h1>
+        <form method="get" class="form-inline mb-4">
+
+            <div class="form-group mr-2">
+                <label for="{{ form.ciudad_ida.id_for_label }}" class="mr-2">Ciudad Ida</label>
+                {{ form.ciudad_ida }}
+                <div class="text-danger">{{ form.errors.ciudad_ida }}</div>
+            </div>
+        
+            <div class="form-group mr-2">
+                <label for="{{ form.ciudad_llegada.id_for_label }}" class="mr-2">Ciudad destino</label>
+                {{ form.ciudad_llegada }}
+                <div class="text-danger">{{ form.errors.ciudad_llegada }}</div>
+            </div>
+        
+            <div class="form-group mr-2">
+                <label for="{{ form.is_complete.id_for_label }}" class="mr-2">Completado</label>
+                {{ form.is_complete }}
+                <div class="text-danger">{{ form.errors.is_complete }}</div>
+            </div>
+        
+            <div class="form-group mr-2">
+                <label for="{{ form.fecha_creacion.id_for_label }}" class="mr-2">Fecha de Creación</label>
+                {{ form.fecha_creacion }}
+                <div class="text-danger">{{ form.errors.fecha_creacion }}</div>
+            </div>
+        
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </form>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Mensajero</th>
+                    <th>Vehículo</th>
+                    <th>Estado</th>
+                    <th>Ciudad recogida</th>
+                    <th>Ciudad llegada</th>
+                    <th>Fecha de Creación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios %}
+                    <tr>
+                        <td>{{ servicio.id }}</td>
+                        <td>{{ servicio.id_cliente.nombres }}</td>
+                        <td>{{ servicio.id_mensajero.nombres }}</td>
+                        <td>{{ servicio.get_vehiculoSolicitado_display }}</td>
+                        <td>{{ servicio.get_estados_display }}</td>
+                        <td>{{ servicio.direccion_recojer.get_ciudad_display }}</td>
+                        <td>{{ servicio.direccion_destino.get_ciudad_display }}</td>
+                        <td>{{ servicio.fecha_creacion }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <nav>
+            <ul class="pagination">
+                {% if servicios.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ servicios.previous_page_number }}">Anterior</a>
+                    </li>
+                {% endif %}
+                {% for i in servicios.paginator.page_range %}
+                    <li class="page-item {% if servicios.number == i %}active{% endif %}">
+                        <a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ i }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+                {% if servicios.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ servicios.next_page_number }}">Siguiente</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+
+
