@@ -1,6 +1,7 @@
 from django import forms
 from .models import Direccion, Servicio
 from applications.users.models import Usuario  
+from datetime import datetime
 
 class DireccionForm(forms.ModelForm):
     class Meta:
@@ -61,3 +62,5 @@ class ServicioFilterForm(forms.Form):
     ciudad_ida = forms.ChoiceField(choices=CIUDAD_CHOICES, required=False)
     ciudad_llegada = forms.ChoiceField(choices=CIUDAD_CHOICES, required=False)
     fecha_creacion = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+
+

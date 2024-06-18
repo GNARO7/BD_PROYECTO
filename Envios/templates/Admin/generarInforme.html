@@ -58,7 +58,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#">Generar informe</a>
                 </li>
-
            
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -81,9 +80,14 @@
         </div>
     </nav>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <h1>Generar Reporte de Envíos</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Generar Reporte</button>
+    </form>
+
 
 </body>
 </html>

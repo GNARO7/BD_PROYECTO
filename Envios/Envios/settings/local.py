@@ -23,9 +23,9 @@ ALLOWED_HOSTS = []
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DB_NAME', 'Envios'),
-        'USER': os.environ.get('DB_USER', 'pablo'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'pablo123'),
+        'NAME': os.environ.get('DB_NAME', 'postgres_proyecto'),
+        'USER': os.environ.get('DB_USER', 'postgres_proyecto'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres_proyecto'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '5432'),
     }

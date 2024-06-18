@@ -20,6 +20,6 @@ urlpatterns = [
     path('listarServiciosAdmin/', ServicioListView.as_view(), name='admin_servicio_list'),
     path('historialMensajero/', HistorialServiciosMensajeroView.as_view(), name='historialMensajero'),
     path('historialCliente/', HistorialServiciosClienteView.as_view(), name='historialCliente'),
-    path('reporte/', generar_reporte, name='generar_reporte'),
+    path('reporte/<int:usuario_id>/', generar_reporte, name='generar_reporte_usuario'),
     
 ]

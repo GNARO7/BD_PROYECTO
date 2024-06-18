@@ -10,7 +10,10 @@ from datetime import datetime
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from applications.users.models import Usuario
 from datetime import datetime
+from django.urls import reverse_lazy
+
 
 
 class CrearServicioView(View, LoginRequiredMixin):
@@ -41,9 +44,14 @@ class CrearServicioView(View, LoginRequiredMixin):
             servicio.id_mensajero = None 
             servicio.is_complete = False
             servicio.save()
-            return redirect('servicio_list')
+            return redirect('indexCliente')
+        
+        
 
         return render(request, 'servicios/crearServicio.html', {'formset': formset, 'servicio_form': servicio_form})
+    
+    def get_success_url(self):
+        return reverse_lazy('indexCliente')
 
 
 class ClienteRequiredMixin(UserPassesTestMixin):
@@ -193,40 +201,38 @@ class ServicioListView(ListView):
     
 
 
-def generar_reporte(request):
+def generar_reporte(request, usuario_id):
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+    if usuario.is_mensajero:
+        servicios = Servicio.objects.filter(id_mensajero=usuario)
+    else:
+        servicios = Servicio.objects.filter(id_cliente=usuario)
+
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="reporte_envios.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="reporte_{usuario.username}.pdf"'
 
     p = canvas.Canvas(response, pagesize=letter)
     width, height = letter
 
     # Header
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(30, height - 30, "Reporte de Envíos")
+    p.drawString(30, height - 30, f"Reporte de Envíos para {usuario.username}")
 
     p.setFont("Helvetica", 12)
     p.drawString(30, height - 60, f"Fecha: {datetime.now().strftime('%Y-%m-%d')}")
 
-    # Ciudades con más llegadas de envíos
+    # Servicios del usuario
     p.setFont("Helvetica-Bold", 14)
-    p.drawString(30, height - 90, "Ciudades con más llegadas de envíos:")
+    p.drawString(30, height - 90, "Servicios asociados:")
 
     y = height - 110
-    for ciudad in Servicio.servicios_cliente.get_ciudades_con_mas_envios():
+    for servicio in servicios:
         p.setFont("Helvetica", 12)
-        p.drawString(30, y, f"{ciudad['direccion_destino__ciudad']}: {ciudad['total']} envíos")
+        p.drawString(30, y, f"ID: {servicio.id}, Descripción: {servicio.descripcion}, Estado: {servicio.estados}, Fecha: {servicio.fecha_creacion.strftime('%Y-%m-%d')}")
         y -= 20
-
-    # Usuarios con más envíos asociados
-    p.setFont("Helvetica-Bold", 14)
-    p.drawString(30, y - 20, "Usuarios con más envíos asociados:")
-
-    y -= 40
-    for usuario in Servicio.servicios_cliente.get_usuarios_con_mas_envios():
-        p.setFont("Helvetica", 12)
-        p.drawString(30, y, f"{usuario['id_cliente__username']}: {usuario['total_envios']} envíos")
-        y -= 20
-
+        if y < 50:  # Start a new page if we're too low on the current one
+            p.showPage()
+            y = height - 50
 
     p.showPage()
     p.save()

@@ -56,6 +56,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'admin_servicio_list' %}">Listar Servicios</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Generar informe</a>
+                </li>
            
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -94,6 +97,8 @@
                     <th>Email</th>
                     <th>Tipo</th>
                     <th>Ciudad</th>
+                    <th>Generar reporte</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -110,6 +115,10 @@
                         {% endif %}
                     </td>
                     <td>{{ usuario.get_ciudad_display }}</td>
+                    <td>
+                        <a href="{% url 'generar_reporte_usuario' usuario.id %}" class="btn btn-primary">Informe</a>
+
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
